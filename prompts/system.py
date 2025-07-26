@@ -61,6 +61,13 @@ B Y X X
 ```
 G, Y and B capture the two Es.
 
+```
+X X X X
+E G E X
+X X X X
+```
+No capture: flanking does not capture. 
+
 There is one additional rule: If your four units are ever part of a single connected component you lose. \
 (Because there would be no way to capture a group of 4 with 4 units)
 """

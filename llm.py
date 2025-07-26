@@ -9,7 +9,7 @@ import time
 client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
 )
-player_model = "gpt-4.1-nano"
+player_model = "gpt-4.1"
 enemy_model = "gpt-4.1"
 
 
