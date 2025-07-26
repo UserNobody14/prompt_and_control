@@ -20,12 +20,14 @@ Based on that output json in the following format to determine a move:
 }
 Where color can be one of the following: {', '.join(unit_colors)} and direction can be one of the following: {', '.join(directions)}. \
 For example:
+```
 {
 "red": "up",
 "blue": "down",
 "green": "left",
 "yellow": "right"
 }
+```
 """
 
 enemy_prompt = """\
