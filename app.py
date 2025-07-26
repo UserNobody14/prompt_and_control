@@ -7,6 +7,7 @@ from ui_display import GameBoardUI
 from async_voice_controller import SimpleAsyncVoiceController
 import tkinter as tk
 
+
 def execute_game_loop(ui, voice_controller):
     """Demo function that moves the red piece up every 2 seconds using voice transcripts."""
 
@@ -16,12 +17,23 @@ def execute_game_loop(ui, voice_controller):
     new_text = ui.transcript.add_message(prompt, full_transcript)
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
         # Submit both tasks
-        ai_future = executor.submit(get_llm_proposed_moves, ui.game_board, Player.ENEMY, None)
-        user_future = executor.submit(get_llm_proposed_moves, ui.game_board, Player.PLAYER, ui.transcript.conversation)
-        
+        ai_future = executor.submit(
+            get_llm_proposed_moves, ui.game_board, Player.ENEMY, None
+        )
+        user_future = executor.submit(
+            get_llm_proposed_moves,
+            ui.game_board,
+            Player.PLAYER,
+            ui.transcript.conversation,
+        )
+
         # Get results from both calls
         ai_selected_moves = ai_future.result()
         user_selected_moves = user_future.result()
+
+    print(f"Last heard: {new_text}")
+    if new_text:
+        ui.set_last_heard(new_text)
 
     # Execute the turn and get results including win condition
     turn_result = ui.game_board.execute_turn(
