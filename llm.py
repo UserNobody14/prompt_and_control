@@ -4,6 +4,7 @@ import json
 from openai import OpenAI
 from gameboard import GameBoard, Player, Direction
 from prompts.system import friendly_prompt, enemy_prompt
+import time
 
 client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
@@ -30,6 +31,7 @@ def get_llm_proposed_moves(
         ]
     print(user_messages)
 
+    start = time.time()
     response = client.chat.completions.create(
         model=model,
         response_format={"type": "json_object"},
@@ -37,6 +39,7 @@ def get_llm_proposed_moves(
         messages=[{"role": "system", "content": prompt}] + user_messages,
     )
     response = response.choices[0].message.content
+    print("LLM response:", response, "\nIn: ", time.time() - start, "(s)")
     try:
         parsed = json.loads(response)
         move = {}

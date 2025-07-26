@@ -20,7 +20,6 @@ class TranscriptManager:
             ]
         else:
             new = new_transcript[len(self.transcript) :]
-            new = "\n".join(new)
             self.conversation += [
                 {"role": "user", "content": prompt + "\n\n#New instructions\n" + new}
             ]

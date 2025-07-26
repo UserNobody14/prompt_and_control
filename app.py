@@ -1,4 +1,5 @@
 import asyncio
+import concurrent.futures
 import threading
 from gameboard import Player
 from llm import get_llm_proposed_moves
@@ -6,24 +7,26 @@ from ui_display import GameBoardUI
 from async_voice_controller import SimpleAsyncVoiceController
 import tkinter as tk
 
-
 def execute_game_loop(ui, voice_controller):
     """Demo function that moves the red piece up every 2 seconds using voice transcripts."""
 
     # Get transcripts from voice controller
     full_transcript = voice_controller.get_full_transcript()
-    print(f"Using transcript for AI: '{full_transcript}'")
     prompt = ui.game_board.to_prompt(Player.PLAYER)
     new_text = ui.transcript.add_message(prompt, full_transcript)
-    ai_selected_moves = get_llm_proposed_moves(ui.game_board, Player.ENEMY, None)
-    player_selected_moves = get_llm_proposed_moves(
-        ui.game_board, Player.PLAYER, ui.transcript.conversation
-    )
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        # Submit both tasks
+        ai_future = executor.submit(get_llm_proposed_moves, ui.game_board, Player.ENEMY, None)
+        user_future = executor.submit(get_llm_proposed_moves, ui.game_board, Player.PLAYER, ui.transcript.conversation)
+        
+        # Get results from both calls
+        ai_selected_moves = ai_future.result()
+        user_selected_moves = user_future.result()
 
     # Execute the turn and get results including win condition
     turn_result = ui.game_board.execute_turn(
         {
-            **player_selected_moves,
+            **user_selected_moves,
             **ai_selected_moves,
         }
     )
