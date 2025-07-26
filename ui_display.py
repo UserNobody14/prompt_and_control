@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import Canvas
 from gameboard import GameBoard, Player, Color, Direction
 from llm import get_llm_proposed_moves
+from transcript_manager import TranscriptManager
 
 
 class GameBoardUI:
@@ -12,10 +13,20 @@ class GameBoardUI:
 
         # Initialize the game board (use provided one or create new)
         self.game_board = game_board if game_board is not None else GameBoard()
+        self.transcript = TranscriptManager()
 
         # Create canvas
         self.canvas = Canvas(master, width=500, height=500, bg="white")
         self.canvas.pack(padx=50, pady=50)
+
+        self.bottom_text = tk.Label(
+            master,
+            text="Your text here",
+            font=("Arial", 12),
+            fg="black",
+            bg=master.cget("bg"),
+        )
+        self.bottom_text.pack(pady=(0, 20))
 
         # Calculate cell size
         self.cell_size = 500 // self.game_board.size
