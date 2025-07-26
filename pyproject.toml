@@ -1,16 +1,12 @@
 [project]
 name = "prompt-and-control"
 version = "0.1.0"
-description = "Add your description here"
+description = "Voice-controlled game using native Python speech recognition"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.8"
 dependencies = [
-    "openai-whisper>=20231117",
-    "sounddevice>=0.4.6",
-    "numpy>=1.24.0",
-    "scipy>=1.10.0",
-    "torch>=2.0.0",
-    "torchaudio>=2.0.0"
+    "SpeechRecognition>=3.10.0",
+    "pyaudio>=0.2.11"
 ]
 
 [build-system]
