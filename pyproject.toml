@@ -1,12 +1,13 @@
 [project]
 name = "prompt-and-control"
 version = "0.1.0"
-description = "Voice-controlled game using native Python speech recognition"
+description = "Voice-controlled game using raw audio capture with transcription"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "SpeechRecognition>=3.10.0",
-    "pyaudio>=0.2.11"
+    "sounddevice>=0.4.6",
+    "numpy>=1.24.0",
+    "SpeechRecognition>=3.10.0"
 ]
 
 [build-system]
