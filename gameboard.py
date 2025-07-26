@@ -13,19 +13,48 @@ class Direction(Enum):
     LEFT = (0, -1)
     RIGHT = (0, 1)
 
+class Color(Enum):
+    RED = "Red"
+    BLUE = "Blue"
+    GREEN = "Green"
+    YELLOW = "Yellow"
+
+    @classmethod
+    def from_idx(cls, i: int) -> 'Color':
+        if i == 0:
+            return cls.RED
+        elif i == 1:
+            return cls.BLUE
+        elif i == 2:
+            return cls.GREEN
+        elif i == 3:
+            return cls.YELLOW
+
+    def to_prompt(self) -> str:
+        """All colors represented by single uppercase character on the baord."""
+        return self.value[0]
+
 
 class Piece:
     """Individual game piece with unique ID and position."""
 
-    def __init__(self, piece_id: int, owner: Player, row: int, col: int):
+    def __init__(self, piece_id: int, owner: Player, row: int, col: int, color: Color):
         self.id = piece_id
         self.owner = owner
         self.row = row
         self.col = col
         self.position = (row, col)
+        self.color = color
 
     def __repr__(self):
         return f"Piece({self.id}, {self.owner.value}, {self.position})"
+
+    def to_prompt(self, player: Player) -> str:
+        """ Friendly units represented as their color, enemy units as 'E'."""
+        if player == self.owner:
+            return self.color.to_prompt()
+        else:
+            return "E"
 
 
 class GameBoard:
@@ -50,15 +79,15 @@ class GameBoard:
         enemy_positions = [(1, 1), (1, 3), (1, 5), (1, 7)]
 
         # Create player pieces
-        for row, col in player_positions:
-            piece = Piece(self.next_piece_id, Player.PLAYER, row, col)
+        for i, (row, col) in enumerate(player_positions):
+            piece = Piece(self.next_piece_id, Player.PLAYER, row, col, Color.from_idx(i))
             self.pieces[piece.id] = piece
             self.board[row][col] = piece
             self.next_piece_id += 1
 
         # Create enemy pieces
-        for row, col in enemy_positions:
-            piece = Piece(self.next_piece_id, Player.ENEMY, row, col)
+        for i, (row, col) in enumerate(enemy_positions):
+            piece = Piece(self.next_piece_id, Player.ENEMY, row, col, Color.from_idx(i))
             self.pieces[piece.id] = piece
             self.board[row][col] = piece
             self.next_piece_id += 1
@@ -268,3 +297,16 @@ class GameBoard:
                 piece.id: piece.position for piece in self.pieces.values()
             },
         }
+
+    def to_prompt(self, player: Player) -> str:
+        """Generate a prompt representation of the game board for the specified player."""
+        prompt = ""
+        for row in range(self.size):
+            for col in range(self.size):
+                piece = self.get_piece_at(row, col)
+                if piece is None:
+                    prompt += "X "
+                else:
+                    prompt += piece.to_prompt(player) + " "
+            prompt += "\n"
+        return prompt.strip()
