@@ -20,7 +20,7 @@ class VoiceController:
         self.sample_rate = 16000
         self.chunk_size = 1024
         self.voice_threshold = 0.005  # Volume threshold for voice detection
-        self.silence_duration = 1.2   # Seconds of silence before ending capture
+        self.silence_duration = 0.5   # Seconds of silence before ending capture
         self.min_speech_duration = 0.2  # Minimum speech length to process
         self.max_speech_duration = 12.0  # Maximum 12 seconds of capture
         self.pre_speech_buffer = 0.8  # Buffer before speech starts (to catch beginning)
