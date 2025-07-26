@@ -13,11 +13,12 @@ def execute_game_loop(ui, voice_controller):
     # Get transcripts from voice controller
     full_transcript = voice_controller.get_full_transcript()
     print(f"Using transcript for AI: '{full_transcript}'")
+    prompt = ui.game_board.to_prompt(Player.PLAYER)
+    new_text = ui.transcript.add_message(prompt, full_transcript)
+    ai_selected_moves = get_llm_proposed_moves(ui.game_board, Player.ENEMY, None)
     player_selected_moves = get_llm_proposed_moves(
-        ui.game_board, Player.PLAYER, full_transcript
+        ui.game_board, Player.PLAYER, ui.transcript.conversation
     )
-
-    ai_selected_moves = get_llm_proposed_moves(ui.game_board, Player.ENEMY, "")
 
     # Execute the turn and get results including win condition
     turn_result = ui.game_board.execute_turn(
@@ -73,7 +74,7 @@ async def async_main():
         app = GameBoardUI(root)
 
         # Start the demo animation after 1 second
-        root.after(1000, lambda: execute_game_loop(app, voice_controller))
+        root.after(200, lambda: execute_game_loop(app, voice_controller))
 
         root.mainloop()
 
