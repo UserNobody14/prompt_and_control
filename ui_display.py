@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import Canvas
-from gameboard import GameBoard, Player
+from gameboard import GameBoard, Player, Color
 
 
 class GameBoardUI:
@@ -19,13 +19,13 @@ class GameBoardUI:
         # Calculate cell size
         self.cell_size = 500 // self.game_board.size
 
-        # Define colors for user pieces (4 different colors based on piece ID)
-        self.user_colors = [
-            "#FF0000",
-            "#00FF00",
-            "#0000FF",
-            "#FFD700",
-        ]  # Red, Green, Blue, Gold
+        # Map Color enum to hex colors
+        self.color_map = {
+            Color.RED: "#FF0000",
+            Color.GREEN: "#00FF00",
+            Color.BLUE: "#0000FF",
+            Color.YELLOW: "#FFD700",
+        }
 
         # Enemy pieces are all black
         self.enemy_color = "#000000"
@@ -66,9 +66,8 @@ class GameBoardUI:
 
         # Determine color
         if piece.owner == Player.PLAYER:
-            # Use different colors for player pieces based on their ID
-            color_index = (piece.id - 1) % len(self.user_colors)
-            color = self.user_colors[color_index]
+            # Use the piece's actual color
+            color = self.color_map[piece.color]
         else:
             color = self.enemy_color
 
