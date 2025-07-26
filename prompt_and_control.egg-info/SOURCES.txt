@@ -1,9 +1,0 @@
-README.md
-main.py
-pyproject.toml
-voice.py
-prompt_and_control.egg-info/PKG-INFO
-prompt_and_control.egg-info/SOURCES.txt
-prompt_and_control.egg-info/dependency_links.txt
-prompt_and_control.egg-info/requires.txt
-prompt_and_control.egg-info/top_level.txt
