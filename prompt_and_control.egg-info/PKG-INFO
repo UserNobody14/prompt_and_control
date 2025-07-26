@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: prompt-and-control
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: openai-whisper>=20231117
+Requires-Dist: sounddevice>=0.4.6
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: scipy>=1.10.0
+Requires-Dist: torch>=2.0.0
+Requires-Dist: torchaudio>=2.0.0
