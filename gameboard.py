@@ -13,6 +13,7 @@ class Direction(Enum):
     LEFT = (0, -1)
     RIGHT = (0, 1)
 
+
 class Color(Enum):
     RED = "Red"
     BLUE = "Blue"
@@ -20,7 +21,7 @@ class Color(Enum):
     YELLOW = "Yellow"
 
     @classmethod
-    def from_idx(cls, i: int) -> 'Color':
+    def from_idx(cls, i: int) -> "Color":
         if i == 0:
             return cls.RED
         elif i == 1:
@@ -50,7 +51,7 @@ class Piece:
         return f"Piece({self.id}, {self.owner.value}, {self.position})"
 
     def to_prompt(self, player: Player) -> str:
-        """ Friendly units represented as their color, enemy units as 'E'."""
+        """Friendly units represented as their color, enemy units as 'E'."""
         if player == self.owner:
             return self.color.to_prompt()
         else:
@@ -80,7 +81,9 @@ class GameBoard:
 
         # Create player pieces
         for i, (row, col) in enumerate(player_positions):
-            piece = Piece(self.next_piece_id, Player.PLAYER, row, col, Color.from_idx(i))
+            piece = Piece(
+                self.next_piece_id, Player.PLAYER, row, col, Color.from_idx(i)
+            )
             self.pieces[piece.id] = piece
             self.board[row][col] = piece
             self.next_piece_id += 1
@@ -112,6 +115,57 @@ class GameBoard:
                 adjacent.append((new_row, new_col))
         return adjacent
 
+    def find_connected_group(self, piece: Piece, visited: set = None) -> set:
+        """Find all pieces connected to the given piece that belong to the same owner.
+        Uses depth-first search to find the connected component."""
+        if visited is None:
+            visited = set()
+
+        visited.add(piece.position)
+        connected_group = {piece}
+
+        for adj_row, adj_col in self.get_adjacent_positions(piece.row, piece.col):
+            adj_piece = self.get_piece_at(adj_row, adj_col)
+            if (
+                adj_piece
+                and adj_piece.owner == piece.owner
+                and adj_piece.position not in visited
+            ):
+                # Recursively find connected pieces
+                connected_subgroup = self.find_connected_group(adj_piece, visited)
+                connected_group.update(connected_subgroup)
+
+        return connected_group
+
+    def get_max_group_sizes(self, piece: Piece) -> Tuple[int, int]:
+        """Get the size of the largest connected group for friendly and enemy pieces
+        adjacent to the given piece. Returns (friendly_max_group_size, enemy_max_group_size)."""
+        friendly_max_size = 0
+        enemy_max_size = 0
+        processed_pieces = set()
+
+        # First, find the size of the piece's own connected group
+        own_group = self.find_connected_group(piece)
+        friendly_max_size = len(own_group)
+        processed_pieces.update(p.position for p in own_group)
+
+        # Check adjacent positions for enemy pieces
+        for adj_row, adj_col in self.get_adjacent_positions(piece.row, piece.col):
+            adj_piece = self.get_piece_at(adj_row, adj_col)
+            if (
+                adj_piece
+                and adj_piece.owner != piece.owner
+                and adj_piece.position not in processed_pieces
+            ):
+                # Find the connected group size for this enemy piece
+                enemy_group = self.find_connected_group(adj_piece)
+                enemy_group_size = len(enemy_group)
+                enemy_max_size = max(enemy_max_size, enemy_group_size)
+                # Mark these pieces as processed to avoid double-counting
+                processed_pieces.update(p.position for p in enemy_group)
+
+        return friendly_max_size, enemy_max_size
+
     def get_support_count(self, piece: Piece) -> Tuple[int, int]:
         """Get count of friendly and enemy pieces adjacent to this piece.
         Returns (friendly_count, enemy_count)."""
@@ -130,14 +184,15 @@ class GameBoard:
 
     def check_captures(self) -> List[Piece]:
         """Check for pieces that should be captured based on support rules.
-        A piece is captured if enemy support > friendly support."""
+        A piece is captured if the largest enemy group adjacent to it is larger
+        than the piece's own connected group."""
         captured_pieces = []
 
         for piece in self.pieces.values():
-            friendly_support, enemy_support = self.get_support_count(piece)
+            friendly_group_size, enemy_max_group_size = self.get_max_group_sizes(piece)
 
-            # If enemy pieces outnumber friendly support, piece is captured
-            if enemy_support > friendly_support:
+            # If the largest enemy group is bigger than this piece's connected group, piece is captured
+            if enemy_max_group_size > friendly_group_size:
                 captured_pieces.append(piece)
 
         return captured_pieces

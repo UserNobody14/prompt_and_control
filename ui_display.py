@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import Canvas
-from gameboard import GameBoard, Player, Color
+from gameboard import GameBoard, Player, Color, Direction
 
 
 class GameBoardUI:
@@ -104,9 +104,53 @@ class GameBoardUI:
         )
 
 
+def get_piece(game_board, player, color):
+    """Find and return the red player piece."""
+    for piece in game_board.pieces.values():
+        if piece.owner == player and (color is None or piece.color == color):
+            return piece
+    return None
+
+
+def demo_move_red_piece(ui):
+    """Demo function that moves the red piece up every 2 seconds."""
+    red_piece = get_piece(ui.game_board, Player.PLAYER, Color.RED)
+
+    if red_piece is None:
+        print("Demo ended: Red piece not found")
+        return
+
+    # Try to move the red piece up
+    move_successful = ui.game_board.execute_turn(
+        {
+            red_piece.id: Direction.UP,
+        }
+    )
+
+    if move_successful:
+        ui.update_display()
+        print(f"Red piece moved to position {red_piece.position}")
+
+        # Schedule the next move in 2 seconds
+        ui.master.after(2000, lambda: demo_move_red_piece(ui))
+    else:
+        print(f"Demo ended: Red piece at {red_piece.position} cannot move up anymore")
+
+
 def main():
     root = tk.Tk()
     app = GameBoardUI(root)
+
+    # Move the first black piece down and 3 to the right
+    black_piece = get_piece(app.game_board, Player.ENEMY, None)
+    if black_piece:
+        app.game_board.move_piece(black_piece.id, Direction.DOWN)
+        app.game_board.move_piece(black_piece.id, Direction.RIGHT)
+        app.game_board.move_piece(black_piece.id, Direction.RIGHT)
+
+    # Start the demo animation after 1 second
+    root.after(1000, lambda: demo_move_red_piece(app))
+
     root.mainloop()
 
 
