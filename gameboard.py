@@ -13,6 +13,21 @@ class Direction(Enum):
     LEFT = (0, -1)
     RIGHT = (0, 1)
 
+    @classmethod
+    def from_str(cls, direction: str) -> Optional['Direction']:
+        """Convert string to Direction enum."""
+        direction = direction.lower()
+        if direction == "up":
+            return cls.UP
+        elif direction == "down":
+            return cls.DOWN
+        elif direction == "left":
+            return cls.LEFT
+        elif direction == "right":
+            return cls.RIGHT
+        else:
+            return None
+
 class Color(Enum):
     RED = "Red"
     BLUE = "Blue"
