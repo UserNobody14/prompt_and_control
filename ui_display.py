@@ -4,13 +4,13 @@ from gameboard import GameBoard, Player, Color
 
 
 class GameBoardUI:
-    def __init__(self, master):
+    def __init__(self, master, game_board=None):
         self.master = master
         self.master.title("Game Board Display")
         self.master.geometry("600x600")
 
-        # Initialize the game board
-        self.game_board = GameBoard()
+        # Initialize the game board (use provided one or create new)
+        self.game_board = game_board if game_board is not None else GameBoard()
 
         # Create canvas
         self.canvas = Canvas(master, width=500, height=500, bg="white")
@@ -31,6 +31,22 @@ class GameBoardUI:
         self.enemy_color = "#000000"
 
         self.draw_board()
+
+    def set_gameboard(self, game_board):
+        """Set a new gameboard and update the display."""
+        self.game_board = game_board
+        self.cell_size = (
+            500 // self.game_board.size
+        )  # Recalculate in case board size changed
+        self.draw_board()
+
+    def update_display(self):
+        """Refresh the display to show current game board state."""
+        self.draw_board()
+
+    def refresh(self):
+        """Alias for update_display() for convenience."""
+        self.update_display()
 
     def draw_board(self):
         """Draw the game board and pieces."""
