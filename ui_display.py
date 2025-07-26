@@ -31,10 +31,10 @@ class GameBoardUI:
             self.last_heard_frame,
             text="Last heard: ",
             font=("Arial", 10),
-            bg="lightgray",
+            bg="gray",
             anchor="w",
-            padx=10,
-            pady=5,
+            padx=25,
+            pady=15,
         )
         self.last_heard_label.pack(fill="x")
 
