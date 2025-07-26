@@ -49,6 +49,41 @@ class GameManager:
         if not self.game_running:
             return
 
+def execute_game_loop(ui, voice_controller):
+    """Demo function that moves the red piece up every 2 seconds using voice transcripts."""
+
+    # Get transcripts from voice controller
+    full_transcript = voice_controller.get_full_transcript()
+    prompt = ui.game_board.to_prompt(Player.PLAYER)
+    new_text = ui.transcript.add_message(prompt, full_transcript)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        # Submit both tasks
+        ai_future = executor.submit(
+            get_llm_proposed_moves, ui.game_board, Player.ENEMY, None
+        )
+        user_future = executor.submit(
+            get_llm_proposed_moves,
+            ui.game_board,
+            Player.PLAYER,
+            ui.transcript.conversation,
+        )
+
+        # Get results from both calls
+        ai_selected_moves = ai_future.result()
+        user_selected_moves = user_future.result()
+
+    print(f"Last heard: {new_text}")
+    if new_text:
+        ui.set_last_heard(new_text)
+
+    # Execute the turn and get results including win condition
+    turn_result = ui.game_board.execute_turn(
+        {
+            **user_selected_moves,
+            **ai_selected_moves,
+        }
+    )
+
         # Get transcripts from voice controller
         full_transcript = self.voice_controller.get_full_transcript()
         prompt = self.ui.game_board.to_prompt(Player.PLAYER)
@@ -114,8 +149,13 @@ async def async_main():
         # Set up the restart callback in the UI
         app.set_restart_callback(game_manager.restart_game)
 
+<<<<<<< HEAD
         # Start the game loop after a short delay
         root.after(200, lambda: game_manager.start_game_loop())
+=======
+        # Start the demo animation after 1 second
+        root.after(1000, lambda: execute_game_loop(app, voice_controller))
+>>>>>>> main
 
         root.mainloop()
 

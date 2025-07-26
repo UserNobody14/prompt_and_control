@@ -26,9 +26,27 @@ class GameBoardUI:
         # Callback for restarting the game loop
         self.restart_callback = None
 
+        # Initialize last heard text
+        self.last_heard = ""
+
         # Create canvas
         self.canvas = Canvas(master, width=500, height=500, bg="white")
-        self.canvas.pack(padx=50, pady=50)
+        self.canvas.pack(padx=50, pady=(50, 10))
+
+        # Create last heard display box
+        self.last_heard_frame = Frame(master, bg="lightgray", relief="sunken", bd=2)
+        self.last_heard_frame.pack(padx=50, pady=(0, 20), fill="x")
+
+        self.last_heard_label = Label(
+            self.last_heard_frame,
+            text="Last heard: ",
+            font=("Arial", 10),
+            bg="gray",
+            anchor="w",
+            padx=25,
+            pady=15,
+        )
+        self.last_heard_label.pack(fill="x")
 
         # Calculate cell size
         self.cell_size = 500 // self.game_board.size
@@ -65,6 +83,15 @@ class GameBoardUI:
     def refresh(self):
         """Alias for update_display() for convenience."""
         self.update_display()
+
+    def set_last_heard(self, text: str):
+        """Set the last heard text and update the display."""
+        self.last_heard = text
+        self.last_heard_label.config(text=f"Last heard: {text}")
+
+    def clear_last_heard(self):
+        """Clear the last heard text."""
+        self.set_last_heard("")
 
     def draw_board(self):
         """Draw the game board and pieces."""
