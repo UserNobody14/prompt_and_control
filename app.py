@@ -79,7 +79,7 @@ async def async_main():
         app = GameBoardUI(root)
 
         # Start the demo animation after 1 second
-        root.after(200, lambda: execute_game_loop(app, voice_controller))
+        root.after(1000, lambda: execute_game_loop(app, voice_controller))
 
         root.mainloop()
 
